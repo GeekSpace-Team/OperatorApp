@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/gradient"
+    android:padding="16dp"
+    tools:context=".MainActivity">
+
+    <LinearLayout
+        android:layout_above="@id/status"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/statusSwitch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:checked="false"
+            android:text="Işjeňleşdir: "
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            />
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@drawable/ic_operator"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="50dp"
+            app:tint="@color/white" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Operator App"
+            android:textAlignment="center"
+            android:textSize="16sp"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_marginTop="40dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/ThemeOverlay.Material3.TextInputEditText.OutlinedBox"
+            android:hint="Server Address"
+            android:textColorHint="@color/white"
+            app:endIconMode="clear_text"
+            app:prefixText="http://"
+            app:prefixTextColor="@color/white"
+            >
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/ip"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/connect"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="22dp"
+            app:backgroundTint="@color/action_first"
+            android:text="Baglanmak"
+            android:textColor="@color/second"
+            />
+
+       <com.google.android.material.card.MaterialCardView
+           app:cardBackgroundColor="@android:color/transparent"
+           app:cardCornerRadius="12dp"
+           app:strokeColor="@color/action_first"
+           android:layout_marginTop="6dp"
+           android:layout_marginBottom="6dp"
+           android:layout_width="match_parent"
+           android:layout_height="match_parent">
+           <ScrollView
+               android:id="@+id/scroll"
+               android:focusable="true"
+               android:focusableInTouchMode="true"
+               android:layout_width="match_parent"
+               android:layout_height="match_parent">
+               <LinearLayout
+                   android:orientation="vertical"
+                   android:id="@+id/consoleView"
+                   android:layout_margin="12dp"
+                   android:layout_width="match_parent"
+                   android:layout_height="wrap_content" />
+           </ScrollView>
+       </com.google.android.material.card.MaterialCardView>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/status"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Powered by: GeekSpace"
+        android:layout_alignParentBottom="true"
+        android:textAlignment="center"
+        android:textSize="12sp"
+        android:textColor="@color/white"
+        />
+
+
+
+</RelativeLayout>

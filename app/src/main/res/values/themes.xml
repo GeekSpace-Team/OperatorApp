@@ -1,0 +1,11 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Theme.OperatorApp" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/white</item>
+        <item name="colorPrimaryVariant">@color/first</item>
+        <item name="colorPrimaryDark">@color/first</item>
+        <item name="colorAccent">@color/action_first</item>
+        <item name="android:forceDarkAllowed">false</item>
+    </style>
+</resources>
