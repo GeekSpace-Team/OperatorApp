@@ -10,6 +10,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.provider.CallLog;
 import android.provider.ContactsContract;
+import android.telecom.Call;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyCallback;
 import android.telephony.TelephonyManager;
@@ -29,11 +30,15 @@ import com.android.operatorapp.Model.CallItem;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 import java.util.concurrent.Executor;
 
 public class CallReceiver extends BroadcastReceiver {
     private static final String TAG = CallReceiver.class.getSimpleName();
+
+
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -46,14 +51,80 @@ public class CallReceiver extends BroadcastReceiver {
         if (intentAction == null || !intentAction.equals("android.intent.action.PHONE_STATE")) {
             return;
         }
+
+        CallChecker.check(context);
+        String number=intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER);
+        String number2=intent.getStringExtra(Intent.EXTRA_PHONE_NUMBER);
+        String state=intent.getStringExtra(TelephonyManager.EXTRA_STATE);
+        Log.e("State",state+" / "+number+" / "+number2);
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             registerCustomTelephonyCallback(context,"");
         } else {
+//            insertCall(intent,context);
             TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
             telephonyManager.listen(new MyPhoneListener(context,""), PhoneStateListener.LISTEN_CALL_STATE);
         }
 
+    }
 
+    private void insertCall(Intent intent, Context context) {
+
+        CallDB callDB = new CallDB(context);
+
+
+        Date c = Calendar.getInstance().getTime();
+        System.out.println("Current time => " + c);
+
+        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault());
+        String formattedDate = df.format(c);
+
+        String currentTime = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
+        String callDirection = "";
+
+        String number=intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER);
+
+        String state=intent.getStringExtra(TelephonyManager.EXTRA_STATE);
+
+        if(number==null)
+        {
+            number=intent.getStringExtra(Intent.EXTRA_PHONE_NUMBER);
+            //Outgoing call
+            CallItem callItem = new CallItem(
+                    number="",
+                    number="",
+                    1 + "",
+                    formattedDate,
+                    currentTime,
+                    "0",
+                    -2,
+                    Utils.generateString());
+            callDB.insert(callItem);
+            callDirection = "Çykyş jaňy";
+            DataSender.sendData(callItem, context);
+        }
+        else if (state.equals("RINGING"))
+        {
+            //Incoming call
+            CallItem callItem = new CallItem(
+                    number="",
+                    number+"",
+                    0 + "",
+                    formattedDate,
+                    currentTime,
+                    "0",
+                    -2,
+                    Utils.generateString());
+            callDB.insert(callItem);
+            callDirection = "Giriş jaňy";
+            DataSender.sendData(callItem, context);
+        }
+
+        try{
+            Utils.writeConsole("Jaň(tel: " + number + ", görnüşi: " + callDirection + ")");
+        } catch (Exception ex){
+            ex.printStackTrace();
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.S)
@@ -77,67 +148,69 @@ public class CallReceiver extends BroadcastReceiver {
         TelephonyManager telephony = (TelephonyManager) context
                 .getSystemService(Context.TELEPHONY_SERVICE);
 
-        telephony.registerTelephonyCallback(context.getMainExecutor(), new CustomTelephonyCallback(new CallBack() {
-            @Override
-            public void callStateChanged(int state) {
-                if(state==TelephonyManager.CALL_STATE_RINGING){
-                    CallItem callItem= RecentCalls.findByState(-2,context);
-                    if(callItem!=null) {
-                        Toast.makeText(context, ""+callItem.getPhNumber(), Toast.LENGTH_SHORT).show();
-                        callItem.setState(TelephonyManager.CALL_STATE_RINGING);
-                        CallDB callDB=new CallDB(context);
-                        callDB.updateData(callItem,callItem.getUniqueId());
-                        DataSender.sendData(callItem,context);
-                        Utils.writeConsole("Jaň(tel: "+callItem.getPhNumber()+", görnüşi: ringing)");
+        try{
+            telephony.registerTelephonyCallback(context.getMainExecutor(), new CustomTelephonyCallback(new CallBack() {
+                @Override
+                public void callStateChanged(int state) {
+                    if(state==TelephonyManager.CALL_STATE_RINGING){
+                        CallItem callItem= RecentCalls.findByState(-2,context);
+                        if(callItem!=null) {
+//                            Toast.makeText(context, ""+callItem.getPhNumber(), Toast.LENGTH_SHORT).show();
+                            callItem.setState(TelephonyManager.CALL_STATE_RINGING);
+                            CallDB callDB=new CallDB(context);
+                            callDB.updateData(callItem,callItem.getUniqueId());
+                            DataSender.sendData(callItem,context);
+                            Utils.writeConsole("Jaň(tel: "+callItem.getPhNumber()+", görnüşi: ringing)");
 
+                        }
                     }
-                }
 
-                if(state==TelephonyManager.CALL_STATE_OFFHOOK){
-                    CallItem callItem= RecentCalls.findByState(-2,context);
-                    if(callItem==null)
-                        callItem=RecentCalls.findByState(TelephonyManager.CALL_STATE_RINGING,context);
-                    if(callItem!=null) {
-                        Toast.makeText(context, ""+callItem.getPhNumber(), Toast.LENGTH_SHORT).show();
-                        callItem.setState(TelephonyManager.CALL_STATE_OFFHOOK);
-                        CallDB callDB=new CallDB(context);
-                        callDB.updateData(callItem,callItem.getUniqueId());
-                        DataSender.sendData(callItem,context);
-                        Utils.writeConsole("Jaň(tel: "+callItem.getPhNumber()+", görnüşi: OFFHOOK)");
+                    if(state==TelephonyManager.CALL_STATE_OFFHOOK){
+                        CallItem callItem= RecentCalls.findByState(-2,context);
+                        if(callItem==null)
+                            callItem=RecentCalls.findByState(TelephonyManager.CALL_STATE_RINGING,context);
+                        if(callItem!=null) {
+//                            Toast.makeText(context, ""+callItem.getPhNumber(), Toast.LENGTH_SHORT).show();
+                            callItem.setState(TelephonyManager.CALL_STATE_OFFHOOK);
+                            CallDB callDB=new CallDB(context);
+                            callDB.updateData(callItem,callItem.getUniqueId());
+                            DataSender.sendData(callItem,context);
+                            Utils.writeConsole("Jaň(tel: "+callItem.getPhNumber()+", görnüşi: OFFHOOK)");
+                        }
                     }
-                }
 
-                if(state==TelephonyManager.CALL_STATE_IDLE){
-                    CallItem callItem= RecentCalls.findByState(TelephonyManager.CALL_STATE_RINGING,context);
-                    if(callItem==null)
-                        callItem=RecentCalls.findByState(TelephonyManager.CALL_STATE_OFFHOOK,context);
-                    if(callItem!=null) {
-                        callItem.setState(TelephonyManager.CALL_STATE_IDLE);
-                        CallDB callDB=new CallDB(context);
-                        callDB.deleteData(callItem.getPhNumber());
+                    if(state==TelephonyManager.CALL_STATE_IDLE){
+                        CallItem callItem= RecentCalls.findByState(TelephonyManager.CALL_STATE_RINGING,context);
+                        if(callItem==null)
+                            callItem=RecentCalls.findByState(TelephonyManager.CALL_STATE_OFFHOOK,context);
+                        if(callItem!=null) {
+                            callItem.setState(TelephonyManager.CALL_STATE_IDLE);
+                            CallDB callDB=new CallDB(context);
+                            callDB.deleteData(callItem.getPhNumber());
 
 
-                        CallItem finalCallItem = callItem;
-                        new Handler().postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                ArrayList<CallItem> callItems=getCallLogByPhoneNumber(context,finalCallItem.getPhNumber());
-                                String duration="0";
-                                if(callItems.size()>0){
-                                    duration=callItems.get(0).getCallDuration();
+                            CallItem finalCallItem = callItem;
+                            new Handler().postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    ArrayList<CallItem> callItems=getCallLogByPhoneNumber(context,finalCallItem.getPhNumber());
+                                    String duration="0";
+                                    if(callItems.size()>0){
+                                        duration=callItems.get(0).getCallDuration();
+                                    }
+                                    finalCallItem.setCallDuration(duration);
+                                    finalCallItem.setState(TelephonyManager.CALL_STATE_IDLE);
+                                    DataSender.sendData(finalCallItem,context);
+                                    Utils.writeConsole("Jaň(tel: "+ finalCallItem.getPhNumber()+", görnüşi: IDLE, duration:"+ duration +")");
                                 }
-                                finalCallItem.setCallDuration(duration);
-                                finalCallItem.setState(TelephonyManager.CALL_STATE_IDLE);
-                                DataSender.sendData(finalCallItem,context);
-                                Utils.writeConsole("Jaň(tel: "+ finalCallItem.getPhNumber()+", görnüşi: IDLE, duration:"+ duration +")");
-                            }
-                        },5000);
+                            },5000);
+                        }
                     }
                 }
-            }
-        }));
-
-
+            }));
+        } catch (Exception ex){
+            ex.printStackTrace();
+        }
     }
 
     interface CallBack {
@@ -153,6 +226,7 @@ public class CallReceiver extends BroadcastReceiver {
             this.context = context;
             this.phoneNumber = phoneNumber;
         }
+
 
         @Override
         public void onCallStateChanged(int state, String phoneNumber) {

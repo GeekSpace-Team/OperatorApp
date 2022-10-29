@@ -6,6 +6,6 @@
         <item name="colorPrimaryVariant">@color/first</item>
         <item name="colorPrimaryDark">@color/first</item>
         <item name="colorAccent">@color/action_first</item>
-        <item name="android:forceDarkAllowed">false</item>
+        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
     </style>
 </resources>

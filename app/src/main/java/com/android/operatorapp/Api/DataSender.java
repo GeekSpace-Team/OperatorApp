@@ -27,15 +27,15 @@ public class DataSender {
 //                            CallDB callDB=new CallDB(context);
 //                            callDB.insert(item);
 //                        }
-                        Toast.makeText(context, "Success", Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(context, "Success", Toast.LENGTH_SHORT).show();
                     } else {
-                        Toast.makeText(context, "" + response.code(), Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(context, "" + response.code(), Toast.LENGTH_SHORT).show();
                     }
                 }
 
                 @Override
                 public void onFailure(Call<GBody<String>> call, Throwable t) {
-                    Toast.makeText(context, t.getMessage(), Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(context, t.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             });
         }

@@ -32,7 +32,11 @@ public class Utils {
     }
 
     public static void writeConsole(String message){
-        MainActivity.get().getConsoleView().w(message);
+        try{
+            MainActivity.get().getConsoleView().w(message);
+        } catch (Exception ex){
+            ex.printStackTrace();
+        }
     }
 
     public static String generateString() {

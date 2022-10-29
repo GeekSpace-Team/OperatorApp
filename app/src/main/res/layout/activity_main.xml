@@ -14,16 +14,41 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <androidx.appcompat.widget.SwitchCompat
-            android:id="@+id/statusSwitch"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:checked="false"
-            android:text="Işjeňleşdir: "
-            android:textColor="@color/white"
-            android:textStyle="bold"
-            />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/logout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:backgroundTint="@android:color/transparent"
+                android:text="Çykmak"
+                android:textColor="@color/white"
+                app:icon="@drawable/ic_baseline_exit_to_app_24"
+                app:iconTint="@color/white"
+                android:textAllCaps="false"
+                style="@style/ThemeOverlay.Material3.Button.TextButton"
+                />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="12dp"
+                android:layout_weight="1"
+                />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/statusSwitch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:checked="false"
+                android:text="Işjeňleşdir: "
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                />
+
+        </LinearLayout>
         <ImageView
             android:layout_width="100dp"
             android:layout_height="100dp"

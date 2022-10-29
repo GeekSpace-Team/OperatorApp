@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
+import android.os.Build;
 import android.os.IBinder;
 import android.provider.CallLog;
 import android.telecom.Call;
@@ -19,6 +20,7 @@ import android.text.format.Time;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 
 import com.android.operatorapp.Api.DataSender;
 import com.android.operatorapp.Common.RecentCalls;
@@ -32,11 +34,13 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+@RequiresApi(api = Build.VERSION_CODES.N)
 public class CallScreenReceiver extends CallScreeningService {
     private final String TAG = CallScreenReceiver.class.getSimpleName();
     private TelephonyManager mTelephonyManager;
     TelephonyManager telephony;
 
+    @RequiresApi(api = Build.VERSION_CODES.Q)
     @Override
     public void onScreenCall(@NonNull Call.Details details) {
 
@@ -45,6 +49,8 @@ public class CallScreenReceiver extends CallScreeningService {
         }
 
         CallDB callDB = new CallDB(this);
+
+        CallChecker.check(this);
 
         Date c = Calendar.getInstance().getTime();
         System.out.println("Current time => " + c);
@@ -60,7 +66,7 @@ public class CallScreenReceiver extends CallScreeningService {
 
         if (details.getCallDirection() == Call.Details.DIRECTION_OUTGOING) {
             Log.e(TAG, "OUTGOING CALL");
-            CallItem callItem=new CallItem(
+            CallItem callItem = new CallItem(
                     getNumberFromDetails(details),
                     getNumberFromDetails(details),
                     Call.Details.DIRECTION_OUTGOING + "",
@@ -71,10 +77,10 @@ public class CallScreenReceiver extends CallScreeningService {
                     Utils.generateString());
             callDB.insert(callItem);
             callDirection = "Çykyş jaňy";
-            DataSender.sendData(callItem,this);
+            DataSender.sendData(callItem, this);
         } else if (details.getCallDirection() == Call.Details.DIRECTION_INCOMING) {
             Log.e(TAG, "INCOMING CALL");
-            CallItem callItem=new CallItem(
+            CallItem callItem = new CallItem(
                     getNumberFromDetails(details),
                     getNumberFromDetails(details),
                     Call.Details.DIRECTION_INCOMING + "",
@@ -85,10 +91,14 @@ public class CallScreenReceiver extends CallScreeningService {
                     Utils.generateString());
             callDB.insert(callItem);
             callDirection = "Giriş jaňy";
-            DataSender.sendData(callItem,this);
+            DataSender.sendData(callItem, this);
         }
 
-        Utils.writeConsole("Jaň(tel: " + getNumberFromDetails(details) + ", görnüşi: " + callDirection + ")");
+        try{
+            Utils.writeConsole("Jaň(tel: " + getNumberFromDetails(details) + ", görnüşi: " + callDirection + ")");
+        } catch (Exception ex){
+            ex.printStackTrace();
+        }
 
     }
 
@@ -126,11 +136,6 @@ public class CallScreenReceiver extends CallScreeningService {
         Log.e(TAG, "Unhandled scheme");
         return null;
     }
-
-
-
-
-
 
 
 }

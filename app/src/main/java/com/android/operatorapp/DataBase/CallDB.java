@@ -57,6 +57,11 @@ public class CallDB extends SQLiteOpenHelper {
         return db.rawQuery("SELECT * FROM "+TBNAME+" WHERE uniqueId = '"+uniqueId+"' ORDER BY ID DESC",null);
     }
 
+    public int deleteIn(String[] uniqueId){
+        SQLiteDatabase db=this.getWritableDatabase();
+        return db.delete(TBNAME,"uniqueId=?",uniqueId);
+    }
+
     public boolean insert(CallItem item){
         SQLiteDatabase db=this.getWritableDatabase();
         ContentValues contentValues=new ContentValues();

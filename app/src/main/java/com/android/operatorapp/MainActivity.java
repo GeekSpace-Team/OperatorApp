@@ -118,6 +118,22 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+        binding.logout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Utils.setPreference("fullName","",context);
+                Utils.setPreference("user_id","",context);
+                Utils.setPreference("phoneNumber","",context);
+                Utils.setPreference("role_name","",context);
+                Utils.setPreference("token","",context);
+                Utils.setPreference("unique_id","",context);
+                Utils.setPreference("sell_point_id","",context);
+                Utils.setPreference("active","0",context);
+                finish();
+                startActivity(new Intent(context,LoginPage.class));
+            }
+        });
     }
 
     private void checkPermissions() {
@@ -136,9 +152,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void requestRole() {
-        RoleManager roleManager = (RoleManager) getSystemService(ROLE_SERVICE);
-        Intent intent = roleManager.createRequestRoleIntent(RoleManager.ROLE_CALL_SCREENING);
-        someActivityResultLauncher.launch(intent);
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+            RoleManager roleManager =  roleManager = (RoleManager) getSystemService(ROLE_SERVICE);
+            Intent intent = roleManager.createRequestRoleIntent(RoleManager.ROLE_CALL_SCREENING);
+            someActivityResultLauncher.launch(intent);
+        }
+
     }
 
     ActivityResultLauncher<Intent> someActivityResultLauncher = registerForActivityResult(
